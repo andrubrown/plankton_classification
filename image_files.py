@@ -6,12 +6,6 @@ Created on Sat Jan 24 10:31:38 2015
 """
 
 """
-TrainClasses - training set classes (directories)
-TrainFiles - training set files
-TestFiles - test set files
-ImageFile
-
-__init__ navigates the directories to find and sort all the classes/files.
 Methods:
 - get a specific image by file number
 - get one or more random images:
@@ -28,7 +22,37 @@ Use random seeds for repeatability.
 
 import os
 import glob
+import pandas as pd
 import skimage.io
+
+
+class ImageSet(object):
+    def __init__(self):
+        self.data = pd.DataFrame()
+
+    def get_image_number(self, number):
+        if type(number) == int:
+            return self.data.loc[number, 'image']
+        else:
+            raise ValueError
+
+
+class TestImages(ImageSet):
+    def __init__(self):
+        filepaths = glob.glob(os.path.join('competition_data',
+                                           'test', '*.jpg'))
+        filenumbers = [int(p.split(os.sep)[-1].split('.')[0])
+                       for p in filepaths]
+        images = [ImageFile(p) for p in filepaths]
+        classes = ['unknown' for p in filepaths]
+        d = {'image': images, 'class': classes}
+        self.data = pd.DataFrame(data=d, index=filenumbers)
+        self.data.sort_index(inplace=True)
+
+
+class TrainImages(ImageSet):
+    def __init__(self):
+        pass
 
 
 class TrainClasses(object):
