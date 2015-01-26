@@ -22,8 +22,11 @@ Use random seeds for repeatability.
 
 import os
 import glob
+import numpy as np
 import pandas as pd
 import skimage.io
+import matplotlib.pyplot as plt
+from pylab import cm
 
 
 class ImageSet(object):
@@ -35,6 +38,11 @@ class ImageSet(object):
             return self.data.loc[number, 'image']
         else:
             raise ValueError
+
+    def get_random_images(self, how_many=1):
+        image_numbers = np.random.choice(self.data.index, size=how_many,
+                                         replace=False)
+        return list(self.data['image'][image_numbers])
 
 
 class TestImages(ImageSet):
@@ -101,4 +109,4 @@ class ImageFile(object):
         return self.image
 
     def plot(self):
-        skimage.io.imshow(self.get_image())
+        plt.imshow(self.get_image(), cmap=cm.gray)
