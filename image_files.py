@@ -33,9 +33,15 @@ class ImageSet(object):
     def __init__(self):
         self.data = pd.DataFrame()
 
-    def get_image_number(self, number):
-        if type(number) == int:
-            return self.data.loc[number, 'image']
+    def get_image_by_id(self, id):
+        if type(id) == int:
+            return self.data.loc[id, 'image']
+        else:
+            raise ValueError
+
+    def get_class_by_id(self, id):
+        if type(id) == int:
+            return self.data.loc[id, 'class']
         else:
             raise ValueError
 
@@ -49,8 +55,7 @@ class TestImages(ImageSet):
     def __init__(self):
         filepaths = glob.glob(os.path.join('competition_data',
                                            'test', '*.jpg'))
-        filenumbers = [int(p.split(os.sep)[-1].split('.')[0])
-                       for p in filepaths]
+        filenumbers = [int(p.split(os.sep)[-1][:-4]) for p in filepaths]
         images = [ImageFile(p) for p in filepaths]
         classes = ['unknown' for p in filepaths]
         d = {'image': images, 'class': classes}
@@ -60,7 +65,19 @@ class TestImages(ImageSet):
 
 class TrainImages(ImageSet):
     def __init__(self):
-        pass
+        train_classes = TrainClasses()
+        filenumbers = []
+        images = []
+        classes = []
+        for c in train_classes.get_class_names():
+            ids = [int(p.split(os.sep)[-1][:-4]) for p in
+                   train_classes.get_image_filepaths(c)]
+            filenumbers.extend(ids)
+            images.extend(train_classes.get_image_files(c))
+            classes.extend(list(np.repeat(c, train_classes.n_images(c))))
+        d = {'image': images, 'class': classes}
+        self.data = pd.DataFrame(data=d, index=filenumbers)
+        self.data.sort_index(inplace=True)
 
 
 class TrainClasses(object):
@@ -78,7 +95,7 @@ class TrainClasses(object):
             self.path[name] = os.path.abspath(p)
             self.filepaths[name] = glob.glob(os.path.join(self.path[name],
                                                           '*.jpg'))
-            self.files[name] = [f.split(os.sep)[-1] for f in self.filepaths]
+            self.files[name] = [ImageFile(f) for f in self.filepaths[name]]
 
     def get_class_names(self):
         return self.names
@@ -101,12 +118,16 @@ class ImageFile(object):
         if filepath[-4:] != '.jpg' or not os.path.exists(filepath):
             raise ValueError
         self.filepath = filepath
+        self.id = int(filepath.split(os.sep)[-1][:-4])
         self.image = None
 
     def get_image(self):
         if self.image is None:
             self.image = skimage.io.imread(self.filepath, as_grey=True)
         return self.image
+
+    def get_id(self):
+        return self.id
 
     def plot(self):
         plt.imshow(self.get_image(), cmap=cm.gray)
