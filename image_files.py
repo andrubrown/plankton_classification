@@ -25,7 +25,7 @@ import glob
 import numpy as np
 import pandas as pd
 import skimage.io
-from skimage import morphology
+from skimage import morphology, measure
 import matplotlib.pyplot as plt
 from pylab import cm
 
@@ -130,19 +130,50 @@ class ImageFile(object):
     def get_id(self):
         return self.id
 
-    def plot(self):
-        plt.imshow(self.get_image(), cmap=cm.gray_r)
+    def plot(self, image=None):
+        if image is None:
+            image = self.get_image()
+        plt.imshow(image, cmap=cm.gray_r)
+
+    def plot_largest_region(self):
+        self.plot(self.get_largest_region()*self.get_image())
 
     def restore_original(self):
         self.image = None
         self.get_image()
 
-    def threshold(self, level='mean'):
-        im = self.get_image()
+    def threshold(self, image=None, level='mean', replace=False):
+        if image is None:
+            image = self.get_image()
         if level == 'mean':
-            level = np.mean(im)
-        self.image = np.where(im > level, 0., 1.)
+            level = np.mean(image)
+        image = np.where(image > level, 0., 1.)
+        if replace:
+            self.image = image
+        return image
 
-    def dilate(self, size=4):
-        im = self.get_image()
-        self.image = morphology.dilation(im, np.ones((4, 4)))
+    def dilate(self, image=None, size=4, replace=False):
+        if image is None:
+            image = self.get_image()
+        image = morphology.dilation(image, np.ones((4, 4)))
+        if replace:
+            self.image = image
+        return image
+
+    def get_largest_region(self):
+        largest_area = 0
+        largest_region = None
+        thresholded = self.threshold()
+        dilated = self.dilate(thresholded)
+        label_map = (measure.label(dilated) + 1) * thresholded
+        for label in np.unique(label_map):
+            region = np.where(label_map == label, 1., 0.)
+            if np.sum(thresholded*region) > largest_area:
+                largest_area = np.sum(region)
+                largest_region = region
+        return largest_region
+
+    def get_largest_region_properties(self):
+        image = self.get_image()
+        largest_region = self.get_largest_region().astype(int)
+        return measure.regionprops(largest_region, image)[0]
