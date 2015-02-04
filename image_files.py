@@ -25,6 +25,7 @@ import glob
 import numpy as np
 import pandas as pd
 import skimage.io
+from skimage import morphology
 import matplotlib.pyplot as plt
 from pylab import cm
 
@@ -130,4 +131,18 @@ class ImageFile(object):
         return self.id
 
     def plot(self):
-        plt.imshow(self.get_image(), cmap=cm.gray)
+        plt.imshow(self.get_image(), cmap=cm.gray_r)
+
+    def restore_original(self):
+        self.image = None
+        self.get_image()
+
+    def threshold(self, level='mean'):
+        im = self.get_image()
+        if level == 'mean':
+            level = np.mean(im)
+        self.image = np.where(im > level, 0., 1.)
+
+    def dilate(self, size=4):
+        im = self.get_image()
+        self.image = morphology.dilation(im, np.ones((4, 4)))
