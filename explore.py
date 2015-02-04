@@ -23,9 +23,22 @@ def random_train_images(seed, size):
 
     for i, image in enumerate(train.get_random_images(n_rows*n_cols)):
         plt.subplot(n_rows, n_cols, i+1)
-        image.plot()
-        plt.title(train.get_class_by_id(image.get_id()),
-                  fontdict={'fontsize': 9})
+        image.plot_largest_region()
+        props = image.get_largest_region_properties()
+        format_string = '{0}\nFilled area: {1}\nEccentricity: {2:.2f}' + \
+            '\nEuler number: {3}\nIntensity range: {4}, {5}' + \
+            '\nSolidity: {6:.2f}\nWeighted Hu moments:\n' + \
+            '{7:.2e} {8:.2e} {9:.2e} {10:.2e}\n{11:.2e} {12:.2e} {13:.2e}'
+        plt.title(format_string.format(
+            train.get_class_by_id(image.get_id()),
+            props.filled_area,
+            props.eccentricity,
+            props.euler_number,
+            props.min_intensity,
+            props.max_intensity,
+            props.solidity,
+            *props.weighted_moments_hu),
+            fontdict={'fontsize': 9})
 
-    plt.tight_layout(1.08, h_pad=1, w_pad=0)
+    plt.tight_layout(1.08, h_pad=3, w_pad=0)
     plt.show()
