@@ -51,6 +51,12 @@ class ImageSet(object):
                                          replace=False)
         return list(self.data['image'][image_numbers])
 
+    def get_random_images_in_class(self, class_name, how_many=1):
+        class_data = self.data[self.data['class'] == class_name]
+        image_numbers = np.random.choice(class_data.index, size=how_many,
+                                         replace=False)
+        return list(self.data['image'][image_numbers])
+
 
 class TestImages(ImageSet):
     def __init__(self):
