@@ -34,6 +34,9 @@ class ImageSet(object):
     def __init__(self):
         self.data = pd.DataFrame()
 
+    def get_all_ids(self):
+        return list(self.data.index)
+
     def get_image_by_id(self, id):
         if type(id) == int:
             return self.data.loc[id, 'image']
