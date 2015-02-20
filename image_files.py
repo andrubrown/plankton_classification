@@ -38,16 +38,10 @@ class ImageSet(object):
         return list(self.data.index)
 
     def get_image_by_id(self, id):
-        if type(id) == int:
-            return self.data.loc[id, 'image']
-        else:
-            raise ValueError
+        return self.data.loc[id, 'image']
 
     def get_class_by_id(self, id):
-        if type(id) == int:
-            return self.data.loc[id, 'class']
-        else:
-            raise ValueError
+        return self.data.loc[id, 'class']
 
     def get_random_images(self, how_many=1):
         image_numbers = np.random.choice(self.data.index, size=how_many,
