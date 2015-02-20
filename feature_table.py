@@ -31,5 +31,7 @@ class FeatureTable(object):
             for p in properties:
                 value = getattr(region_props, p)
                 table[p].append(value)
-        self.data = pd.concat([self.data, pd.DataFrame(data=table,
-                                                       index=self.data.index)])
+        self.data = pd.concat([self.data,
+                               pd.DataFrame(data=table,
+                                            index=self.data.index)],
+                              axis=1)
