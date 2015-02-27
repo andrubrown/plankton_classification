@@ -133,13 +133,13 @@ class ImageFile(object):
     def get_id(self):
         return self.id
 
-    def plot(self, image=None):
+    def plot(self, image=None, **kwargs):
         if image is None:
             image = self.get_image()
-        plt.imshow(image, cmap=cm.gray_r)
+        plt.imshow(image, cmap=cm.gray_r, **kwargs)
 
-    def plot_largest_region(self):
-        self.plot(self.get_largest_region()*self.get_image())
+    def plot_largest_region(self, **kwargs):
+        self.plot(self.get_largest_region()*self.get_image(), **kwargs)
 
     def restore_original(self):
         self.image = None
