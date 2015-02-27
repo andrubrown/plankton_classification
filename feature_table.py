@@ -28,7 +28,11 @@ class FeatureTable(object):
         self.data = pd.DataFrame(data={'class': classes}, index=ids)
         self.scaler = None
 
-    def add_largest_region_properties(self, properties, scaler=None):
+    def add_largest_region_properties(self, properties=None, scaler=None):
+        if properties is None:
+            properties = ['filled_area', 'euler_number', 'eccentricity',
+                          'min_intensity', 'max_intensity', 'solidity',
+                          'weighted_moments_hu']
         table = {}
         for i in self.data.index:
             image = self.image_set.get_image_by_id(int(i))
