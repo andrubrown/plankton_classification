@@ -34,10 +34,9 @@ while len(n_estimators) != 1:
     clf_opt = GridSearchCV(clf, {'n_estimators': n_estimators},
                            scoring='log_loss', cv=5)
     clf_opt.fit(train_features, train_classes)
-    if len(n_estimators) > 1:
-        print 'log loss estimates:'
-        for cv_score in clf_opt.grid_scores_:
-            print cv_score
+    print 'Estimated log loss:'
+    for cv_score in clf_opt.grid_scores_:
+        print cv_score
 
 test_features, test_index = get_test_features(features,
                                               test_file='test_features.csv')
