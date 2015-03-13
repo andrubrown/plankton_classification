@@ -27,5 +27,15 @@ Multiclass log loss was used for evaluation.
 					  test images
 - `learning_curve.py`: plots learning curves using multiclass log loss
 
+### Evaluation
+
+The baseline (uniform probability for all classes) results in a multiclass
+log loss of about 4.8. The tutorial, which uses 25x25 pixels to represent
+each image and adds a feature based on the ratio of major and minor axes
+of the largest region, reduces the log loss to about 3.7. The best models
+from the scripts included here achieve a log loss around 2.0 using 
+a random forest or SVM with a radial basis function and a set of
+10 features computed from the largest region in each image.
+
 
 [1]: https://www.kaggle.com/c/datasciencebowl
